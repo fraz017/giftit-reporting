@@ -20,4 +20,3 @@
 //= require admin/bootstrap-notify
 //= require admin/black-dashboard.min
 //= require admin/dashboard
-//= require cocoon
