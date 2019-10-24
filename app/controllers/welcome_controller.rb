@@ -1,5 +1,5 @@
 class WelcomeController < ApplicationController
   def index
-    sign_out current_sub_admin
+    @mcards = current_sub_admin.mcards
   end
 end
