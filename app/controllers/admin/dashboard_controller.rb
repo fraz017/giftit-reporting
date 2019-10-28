@@ -4,38 +4,62 @@ class Admin::DashboardController < AdminController
   def index
     @mcard = Mcard.find params[:id]
     authorize!(:read, @mcard)
-    # id = Content.where(name: params[:page]).first
-    # if params[:page].present? && id.present?
-    #   views = TrackView.where(content_id: id.id).group_by_hour(:created_at, range: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, time_zone: Time.zone.name, format: "%-l %p").count
-    #   @today = TrackView.where(content_id: id.id, created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day)
-    #   @tm = @today.map{|x| {lat: x.latitude, lng: x.longitude}}
-    #   @day = views.keys
-    #   @daydata = views.values
-    #   views = TrackView.where(content_id: id.id).group_by_day(:created_at, range: 1.week.ago..Time.zone.now, time_zone: Time.zone.name, format: "%a").count
-    #   @lastweek = TrackView.where(content_id: id.id, created_at: 1.week.ago..Time.zone.now)
-    #   @wm = @lastweek.map{|x| {lat: x.latitude, lng: x.longitude}}
-    #   @week = views.keys
-    #   @weekdata = views.values
-    #   views = TrackView.where(content_id: id.id).group_by_day(:created_at, range: 1.month.ago..Time.zone.now, time_zone: Time.zone.name, format: "%d %b").count
-    #   @lastmonth = TrackView.where(content_id: id.id, created_at: 1.month.ago..Time.zone.now)
-    #   @mm = @lastmonth.map{|x| {lat: x.latitude, lng: x.longitude}}
-    #   @month = views.keys
-    #   @monthdata = views.values
-    # else
-    #   @day = []
-    #   @daydata = []
-    #   @week = []
-    #   @weekdata = []
-    #   @month = []
-    #   @monthdata = []
-    #   @today = []
-    #   @lastweek = []
-    #   @lastmonth = []
-    #   @tm =[]
-    #   @wm = []
-    #   @mm = []
-    # end  
-    
+      @day = []
+      @daydata = []
+
+      @week = []
+      @weekdata = []
+      
+      @month = []
+      @monthdata = []
+      
+      @today = []
+      
+      @lastweek = []
+      
+      @lastmonth = []
+      
+      @tm =[]
+      @wm = []
+      @mm = []
+
+
+      views = @mcard.mcard_codes.group_by_hour(:recieved_at, range: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, time_zone: Time.zone.name, format: "%-l %p").count
+      @today = @mcard.mcard_codes.where(recieved_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day)
+      @todayS = @mcard.mcard_codes.where("recieved_at IS ?", nil).where(sent_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day)
+      @day = views.keys
+      @daydata = views.values
+      
+      views = @mcard.mcard_codes.group_by_day(:recieved_at, range: 1.week.ago..Time.zone.now, time_zone: Time.zone.name, format: "%a").count
+      
+      @lastweek = @mcard.mcard_codes.where("recieved_at IS NOT ?", nil).where(recieved_at: 1.week.ago..Time.zone.now)
+      @lastweekS = @mcard.mcard_codes.where("recieved_at IS ?", nil).where(sent_at: 1.week.ago..Time.zone.now)
+      @week = views.keys
+      @weekdata = views.values
+      
+      
+      views = @mcard.mcard_codes.group_by_day(:recieved_at, range: 1.month.ago..Time.zone.now, time_zone: Time.zone.name, format: "%d %b").count
+      @month = views.keys
+      @monthdata = views.values
+
+
+      @lastmonth = @mcard.mcard_codes.where(recieved_at: 1.month.ago..Time.zone.now)
+      @lastmonthS = @mcard.mcard_codes.where("recieved_at IS ?", nil).where(sent_at: 1.month.ago..Time.zone.now)
+      @lastSixMonth = @mcard.mcard_codes.where(created_at: 6.month.ago..Time.zone.now).count
+      @lastSixMonthR = @mcard.mcard_codes.where("recieved_at IS NOT ?", nil).where(recieved_at: 6.month.ago..Time.zone.now).count
+      @lastSixMonthS = @mcard.mcard_codes.where(sent_at: 6.month.ago..Time.zone.now).count
+      
+      views = @mcard.mcard_codes.group_by_month(:sent_at, range: 6.month.ago..Time.zone.now, time_zone: Time.zone.name, format: "%b").count
+      @slsmlabels = views.keys
+      @slsmdata = views.values
+
+      views = @mcard.mcard_codes.where("recieved_at IS NOT ?", nil).group_by_month(:recieved_at, range: 6.month.ago..Time.zone.now, time_zone: Time.zone.name, format: "%b").count
+      @rlsmlabels = views.keys
+      @rlsmdata = views.values
+
+      views = @mcard.mcard_codes.group_by_month(:created_at, range: 6.month.ago..Time.zone.now, time_zone: Time.zone.name, format: "%b").count
+      @lsmlabels = views.keys
+      @lsmdata = views.values      
   end
 
   # def destroy_data
